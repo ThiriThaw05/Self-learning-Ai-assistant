@@ -25,7 +25,7 @@ def generate_reply():
     
     Request Body:
     {
-        "clientSequence": "I'm American and currently in Bali. Can I apply from Indonesia?",
+        "message": "I'm American and currently in Bali. Can I apply from Indonesia?",
         "chatHistory": [
             {"role": "consultant", "message": "Hi there! Thank you for reaching out..."},
             {"role": "client", "message": "Hello, I'm interested in the DTV visa..."}
@@ -43,11 +43,12 @@ def generate_reply():
         if not data:
             return jsonify({"error": "Request body is required"}), 400
         
-        client_sequence = data.get('clientSequence', '')
+        # Accept both 'message' and 'clientSequence' for flexibility
+        client_sequence = data.get('message') or data.get('clientSequence', '')
         chat_history = data.get('chatHistory', [])
         
         if not client_sequence:
-            return jsonify({"error": "clientSequence is required"}), 400
+            return jsonify({"error": "message is required"}), 400
         
         # Format chat history
         history_text = format_history_from_request(chat_history)
