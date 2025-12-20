@@ -1,15 +1,24 @@
 import os
 import json
+import requests
 from typing import Optional
-import google.generativeai as genai
-from groq import Groq
-from anthropic import Anthropic
+
+# Try to import optional LLM libraries
+try:
+    from groq import Groq
+except ImportError:
+    Groq = None
+
+try:
+    from anthropic import Anthropic
+except ImportError:
+    Anthropic = None
 
 
 class LLMService:
     """
     Unified LLM service wrapper supporting multiple providers.
-    Supports: Google (Gemini), Groq (Llama/Mistral), Anthropic (Claude)
+    Supports: Google (Gemini via REST), Groq (Llama/Mistral), Anthropic (Claude)
     """
     
     def __init__(self, provider: str = None):
@@ -22,10 +31,10 @@ class LLMService:
     
     def _detect_provider(self) -> str:
         """Auto-detect which LLM provider to use based on available API keys."""
-        if os.getenv("GOOGLE_API_KEY"):
-            return "google"
-        elif os.getenv("GROQ_API_KEY"):
+        if os.getenv("GROQ_API_KEY"):
             return "groq"
+        elif os.getenv("GOOGLE_API_KEY"):
+            return "google"
         elif os.getenv("ANTHROPIC_API_KEY"):
             return "anthropic"
         elif os.getenv("OPENAI_API_KEY"):
@@ -36,17 +45,18 @@ class LLMService:
     def _init_client(self):
         """Initialize the appropriate LLM client."""
         if self.provider == "google":
-            api_key = os.getenv("GOOGLE_API_KEY")
-            if not api_key:
+            self.api_key = os.getenv("GOOGLE_API_KEY")
+            if not self.api_key:
                 raise ValueError("GOOGLE_API_KEY not found")
-            genai.configure(api_key=api_key)
-            # Use the newer model name (gemini-1.5-flash is fast and free)
-            self.model = genai.GenerativeModel('gemini-1.5-flash')
+            # Use REST API directly - more reliable
+            self.model_name = "gemini-1.5-flash"
             
         elif self.provider == "groq":
             api_key = os.getenv("GROQ_API_KEY")
             if not api_key:
                 raise ValueError("GROQ_API_KEY not found")
+            if Groq is None:
+                raise ValueError("groq package not installed")
             self.client = Groq(api_key=api_key)
             self.model_name = "llama-3.1-70b-versatile"
             
@@ -54,6 +64,8 @@ class LLMService:
             api_key = os.getenv("ANTHROPIC_API_KEY")
             if not api_key:
                 raise ValueError("ANTHROPIC_API_KEY not found")
+            if Anthropic is None:
+                raise ValueError("anthropic package not installed")
             self.client = Anthropic(api_key=api_key)
             self.model_name = "claude-3-sonnet-20240229"
             
@@ -71,8 +83,22 @@ class LLMService:
         """Generate a response from the LLM."""
         try:
             if self.provider == "google":
-                response = self.model.generate_content(prompt)
-                return response.text
+                # Use REST API directly for reliability
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model_name}:generateContent?key={self.api_key}"
+                
+                payload = {
+                    "contents": [{"parts": [{"text": prompt}]}],
+                    "generationConfig": {
+                        "maxOutputTokens": max_tokens,
+                        "temperature": 0.7
+                    }
+                }
+                
+                response = requests.post(url, json=payload)
+                response.raise_for_status()
+                
+                result = response.json()
+                return result["candidates"][0]["content"]["parts"][0]["text"]
             
             elif self.provider == "groq":
                 response = self.client.chat.completions.create(
