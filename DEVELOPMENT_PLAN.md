@@ -103,7 +103,7 @@ if __name__ == '__main__':
     app.run(host='0.0.0.0', port=port, debug=True)
 ```
 
-### 1.4 Deploy to Railway (Initial)
+### 1.4 Deploy to Render (Initial)
 
 Create `Procfile`:
 ```
@@ -115,7 +115,21 @@ Create `runtime.txt`:
 python-3.11.0
 ```
 
-Push to GitHub, connect Railway to repo.
+**Render Configuration:**
+1. Connect your GitHub repo to Render
+2. Configure the Web Service:
+   - **Name**: `dtv-assistant`
+   - **Branch**: `main`
+   - **Runtime**: `Python 3`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `gunicorn app.main:app`
+3. Add Environment Variables in Render dashboard:
+   - `GOOGLE_API_KEY` (or your LLM provider key)
+   - `SUPABASE_URL`
+   - `SUPABASE_KEY`
+   - `FLASK_ENV=production`
+
+Push to GitHub, Render will auto-deploy.
 
 ---
 
@@ -698,11 +712,11 @@ if __name__ == '__main__':
 ### 7.1 Test cURL Commands
 
 ```bash
-# Test health
-curl https://your-app.railway.app/health
+# Test health (replace with your Render URL)
+curl https://your-app.onrender.com/health
 
 # Test generate-reply
-curl -X POST https://your-app.railway.app/generate-reply \
+curl -X POST https://your-app.onrender.com/generate-reply \
   -H "Content-Type: application/json" \
   -d '{
     "clientSequence": "I am American and currently in Bali. Can I apply from Indonesia?",
@@ -713,7 +727,7 @@ curl -X POST https://your-app.railway.app/generate-reply \
   }'
 
 # Test improve-ai
-curl -X POST https://your-app.railway.app/improve-ai \
+curl -X POST https://your-app.onrender.com/improve-ai \
   -H "Content-Type: application/json" \
   -d '{
     "clientSequence": "I am American and currently in Bali. Can I apply from Indonesia?",
@@ -725,7 +739,7 @@ curl -X POST https://your-app.railway.app/improve-ai \
   }'
 
 # Test improve-ai-manually
-curl -X POST https://your-app.railway.app/improve-ai-manually \
+curl -X POST https://your-app.onrender.com/improve-ai-manually \
   -H "Content-Type: application/json" \
   -d '{
     "instructions": "Be more concise. Always mention the money-back guarantee when discussing our services."
