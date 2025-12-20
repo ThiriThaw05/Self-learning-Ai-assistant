@@ -40,7 +40,8 @@ class LLMService:
             if not api_key:
                 raise ValueError("GOOGLE_API_KEY not found")
             genai.configure(api_key=api_key)
-            self.model = genai.GenerativeModel('gemini-pro')
+            # Use the newer model name (gemini-1.5-flash is fast and free)
+            self.model = genai.GenerativeModel('gemini-1.5-flash')
             
         elif self.provider == "groq":
             api_key = os.getenv("GROQ_API_KEY")
