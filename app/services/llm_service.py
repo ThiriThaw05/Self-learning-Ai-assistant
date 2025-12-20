@@ -48,8 +48,8 @@ class LLMService:
             self.api_key = os.getenv("GOOGLE_API_KEY")
             if not self.api_key:
                 raise ValueError("GOOGLE_API_KEY not found")
-            # Use REST API directly - more reliable
-            self.model_name = "gemini-1.5-flash"
+            # Try multiple model names for compatibility
+            self.model_names = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"]
             
         elif self.provider == "groq":
             api_key = os.getenv("GROQ_API_KEY")
@@ -83,22 +83,33 @@ class LLMService:
         """Generate a response from the LLM."""
         try:
             if self.provider == "google":
-                # Use REST API directly for reliability
-                url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model_name}:generateContent?key={self.api_key}"
+                # Try multiple model names until one works
+                last_error = None
+                for model_name in self.model_names:
+                    try:
+                        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={self.api_key}"
+                        
+                        payload = {
+                            "contents": [{"parts": [{"text": prompt}]}],
+                            "generationConfig": {
+                                "maxOutputTokens": max_tokens,
+                                "temperature": 0.7
+                            }
+                        }
+                        
+                        response = requests.post(url, json=payload)
+                        response.raise_for_status()
+                        
+                        result = response.json()
+                        print(f"✅ Google model {model_name} worked!")
+                        return result["candidates"][0]["content"]["parts"][0]["text"]
+                    except requests.exceptions.HTTPError as e:
+                        last_error = e
+                        print(f"⚠️ Model {model_name} failed: {e}")
+                        continue
                 
-                payload = {
-                    "contents": [{"parts": [{"text": prompt}]}],
-                    "generationConfig": {
-                        "maxOutputTokens": max_tokens,
-                        "temperature": 0.7
-                    }
-                }
-                
-                response = requests.post(url, json=payload)
-                response.raise_for_status()
-                
-                result = response.json()
-                return result["candidates"][0]["content"]["parts"][0]["text"]
+                # All models failed
+                raise last_error or Exception("All Google models failed")
             
             elif self.provider == "groq":
                 response = self.client.chat.completions.create(
