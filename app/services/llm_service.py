@@ -58,7 +58,7 @@ class LLMService:
             if Groq is None:
                 raise ValueError("groq package not installed")
             self.client = Groq(api_key=api_key)
-            self.model_name = "llama-3.1-70b-versatile"
+            self.model_name = "llama-3.3-70b-versatile"  # Updated model
             
         elif self.provider == "anthropic":
             api_key = os.getenv("ANTHROPIC_API_KEY")
