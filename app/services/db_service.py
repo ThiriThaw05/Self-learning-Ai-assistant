@@ -1,34 +1,42 @@
 import os
 from typing import Optional
-from supabase import create_client, Client
+
+# Use requests directly to avoid Supabase SDK version issues
+import requests
 
 
 class DatabaseService:
     """
     Database service for managing prompts in Supabase.
+    Uses REST API directly for maximum compatibility.
     """
     
     def __init__(self):
-        url = os.getenv("SUPABASE_URL")
-        key = os.getenv("SUPABASE_KEY")
+        self.url = os.getenv("SUPABASE_URL")
+        self.key = os.getenv("SUPABASE_KEY")
         
-        if not url or not key:
+        if not self.url or not self.key:
             raise ValueError("SUPABASE_URL and SUPABASE_KEY must be set in environment")
         
-        self.client: Client = create_client(url, key)
+        self.headers = {
+            "apikey": self.key,
+            "Authorization": f"Bearer {self.key}",
+            "Content-Type": "application/json",
+            "Prefer": "return=representation"
+        }
+        self.rest_url = f"{self.url}/rest/v1"
         print("✅ Database service initialized")
     
     def get_prompt(self, name: str = "chatbot_prompt") -> Optional[str]:
         """Retrieve a prompt from the database by name."""
         try:
-            response = self.client.table("prompts") \
-                .select("content") \
-                .eq("name", name) \
-                .single() \
-                .execute()
+            url = f"{self.rest_url}/prompts?name=eq.{name}&select=content"
+            response = requests.get(url, headers=self.headers)
+            response.raise_for_status()
             
-            if response.data:
-                return response.data.get("content")
+            data = response.json()
+            if data and len(data) > 0:
+                return data[0].get("content")
             return None
             
         except Exception as e:
@@ -38,13 +46,10 @@ class DatabaseService:
     def update_prompt(self, name: str, content: str) -> bool:
         """Update an existing prompt in the database."""
         try:
-            self.client.table("prompts") \
-                .update({
-                    "content": content,
-                    "updated_at": "now()"
-                }) \
-                .eq("name", name) \
-                .execute()
+            url = f"{self.rest_url}/prompts?name=eq.{name}"
+            payload = {"content": content}
+            response = requests.patch(url, headers=self.headers, json=payload)
+            response.raise_for_status()
             
             print(f"✅ Prompt '{name}' updated successfully")
             return True
@@ -56,12 +61,10 @@ class DatabaseService:
     def create_prompt(self, name: str, content: str) -> bool:
         """Create a new prompt in the database."""
         try:
-            self.client.table("prompts") \
-                .insert({
-                    "name": name,
-                    "content": content
-                }) \
-                .execute()
+            url = f"{self.rest_url}/prompts"
+            payload = {"name": name, "content": content}
+            response = requests.post(url, headers=self.headers, json=payload)
+            response.raise_for_status()
             
             print(f"✅ Prompt '{name}' created successfully")
             return True
