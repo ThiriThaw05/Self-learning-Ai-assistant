@@ -141,6 +141,7 @@ class LLMService:
     
     def generate_json(self, prompt: str) -> dict:
         """Generate a response and parse it as JSON."""
+        import re
         response = self.generate(prompt)
         
         try:
@@ -151,8 +152,32 @@ class LLMService:
             
             if start != -1 and end > start:
                 json_str = response[start:end]
-                return json.loads(json_str)
-        except json.JSONDecodeError as e:
+                
+                # Try direct parsing first
+                try:
+                    return json.loads(json_str)
+                except json.JSONDecodeError:
+                    pass
+                
+                # Try fixing common issues: unescaped newlines in strings
+                # Replace actual newlines inside strings with \n
+                fixed_json = re.sub(r'(?<!\\)\n', '\\n', json_str)
+                try:
+                    return json.loads(fixed_json)
+                except json.JSONDecodeError:
+                    pass
+                
+                # Last resort: extract just the prompt field using regex
+                prompt_match = re.search(r'"prompt"\s*:\s*"(.*?)"(?=\s*,\s*"changes_made"|$)', json_str, re.DOTALL)
+                changes_match = re.search(r'"changes_made"\s*:\s*"([^"]*)"', json_str)
+                
+                if prompt_match:
+                    return {
+                        "prompt": prompt_match.group(1).replace('\\n', '\n').replace('\\"', '"'),
+                        "changes_made": changes_match.group(1) if changes_match else "Updated prompt"
+                    }
+                    
+        except Exception as e:
             print(f"⚠️ JSON parse error: {e}")
             pass
         
