@@ -119,7 +119,7 @@ Your task is to apply the user's instructions to improve the chatbot prompt.
 Make targeted, specific changes while preserving the overall structure and knowledge base.
 Ensure the prompt remains clear and well-organized.
 
-Return your response as JSON:
-{{"prompt": "the complete updated prompt text"}}
+Return ONLY a JSON object in this exact format (no markdown, no code blocks):
+{{"prompt": "the complete updated prompt text here"}}
 
-IMPORTANT: Return ONLY the JSON object, no other text."""
+The prompt value should be the full updated prompt with the user's changes applied. Escape any quotes inside the prompt with backslash."""

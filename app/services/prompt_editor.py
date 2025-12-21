@@ -81,6 +81,7 @@ class PromptEditorService:
         Returns:
             dict with success status and updated_prompt
         """
+        import re
         current_prompt = self.get_current_prompt()
         
         # Build the manual editor prompt
@@ -101,10 +102,33 @@ class PromptEditorService:
                 "updated_prompt": result["prompt"]
             }
         
+        # If JSON parsing failed, try to extract prompt from raw response
+        raw = result.get("raw_response", "")
+        if raw:
+            # Try to find a large text block that looks like a prompt
+            # Look for text between "prompt": and the end
+            match = re.search(r'"prompt"\s*:\s*"(.+)', raw, re.DOTALL)
+            if match:
+                extracted = match.group(1)
+                # Find where it ends (before "changes_made" or end of JSON)
+                end_match = re.search(r'"\s*,?\s*"?changes_made|"\s*\}', extracted)
+                if end_match:
+                    extracted = extracted[:end_match.start()]
+                
+                # Clean up escaped characters
+                extracted = extracted.replace('\\n', '\n').replace('\\"', '"').rstrip('"')
+                
+                if len(extracted) > 100:  # Reasonable prompt length
+                    success = self.db.update_prompt("chatbot_prompt", extracted)
+                    return {
+                        "success": success,
+                        "updated_prompt": extracted[:200] + "..." if len(extracted) > 200 else extracted
+                    }
+        
         return {
             "success": False,
             "error": result.get("error", "Failed to generate improved prompt"),
-            "raw_response": result.get("raw_response", "")
+            "raw_response": raw[:500] if raw else ""
         }
     
     def generate_reply(self, client_message: str, chat_history: str) -> str:
