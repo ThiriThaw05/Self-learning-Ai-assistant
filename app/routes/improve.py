@@ -160,3 +160,38 @@ def get_current_prompt():
     except Exception as e:
         print(f"❌ Error in /get-prompt: {e}")
         return jsonify({"error": str(e)}), 500
+
+
+@improve_bp.route('/reset-prompt', methods=['POST'])
+def reset_prompt():
+    """
+    Reset the chatbot prompt to the default base template.
+    Use this if the prompt gets corrupted or you want to start fresh.
+    
+    Response:
+    {
+        "success": true,
+        "message": "Prompt reset to default template"
+    }
+    """
+    try:
+        from app.prompts.base_prompts import CHATBOT_PROMPT
+        from app.services.db_service import get_db_service
+        
+        db = get_db_service()
+        success = db.update_prompt("chatbot_prompt", CHATBOT_PROMPT)
+        
+        if success:
+            return jsonify({
+                "success": True,
+                "message": "Prompt reset to default template"
+            })
+        else:
+            return jsonify({
+                "success": False,
+                "error": "Failed to reset prompt"
+            }), 500
+    
+    except Exception as e:
+        print(f"❌ Error in /reset-prompt: {e}")
+        return jsonify({"error": str(e)}), 500
