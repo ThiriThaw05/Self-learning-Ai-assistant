@@ -58,7 +58,13 @@ class LLMService:
             if Groq is None:
                 raise ValueError("groq package not installed")
             self.client = Groq(api_key=api_key)
-            self.model_name = "llama-3.3-70b-versatile"  # Updated model
+            # Primary model with fallbacks for rate limiting
+            self.model_names = [
+                "llama-3.3-70b-versatile",  # Best quality
+                "llama-3.1-8b-instant",      # Faster, lower rate limit usage
+                "gemma2-9b-it"               # Alternative fallback
+            ]
+            self.model_name = self.model_names[0]
             
         elif self.provider == "anthropic":
             api_key = os.getenv("ANTHROPIC_API_KEY")
@@ -112,12 +118,28 @@ class LLMService:
                 raise last_error or Exception("All Google models failed")
             
             elif self.provider == "groq":
-                response = self.client.chat.completions.create(
-                    model=self.model_name,
-                    messages=[{"role": "user", "content": prompt}],
-                    max_tokens=max_tokens
-                )
-                return response.choices[0].message.content
+                # Try models with fallback for rate limiting
+                last_error = None
+                for model in self.model_names:
+                    try:
+                        response = self.client.chat.completions.create(
+                            model=model,
+                            messages=[{"role": "user", "content": prompt}],
+                            max_tokens=max_tokens
+                        )
+                        if model != self.model_names[0]:
+                            print(f"⚠️ Using fallback model: {model}")
+                        return response.choices[0].message.content
+                    except Exception as e:
+                        error_str = str(e)
+                        if "rate_limit" in error_str.lower() or "429" in error_str:
+                            print(f"⚠️ Rate limited on {model}, trying fallback...")
+                            last_error = e
+                            continue
+                        else:
+                            raise e
+                # All models rate limited
+                raise last_error or Exception("All Groq models rate limited")
             
             elif self.provider == "anthropic":
                 response = self.client.messages.create(
