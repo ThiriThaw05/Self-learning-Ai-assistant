@@ -99,7 +99,7 @@ class LLMService:
                             "contents": [{"parts": [{"text": prompt}]}],
                             "generationConfig": {
                                 "maxOutputTokens": max_tokens,
-                                "temperature": 0.7
+                                "temperature": 0.5  # Lower temperature for more consistent responses
                             }
                         }
                         
@@ -125,7 +125,8 @@ class LLMService:
                         response = self.client.chat.completions.create(
                             model=model,
                             messages=[{"role": "user", "content": prompt}],
-                            max_tokens=max_tokens
+                            max_tokens=max_tokens,
+                            temperature=0.5  # Lower temperature for more consistent, instruction-following responses
                         )
                         if model != self.model_names[0]:
                             print(f"⚠️ Using fallback model: {model}")
