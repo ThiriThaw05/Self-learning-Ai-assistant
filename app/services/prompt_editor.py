@@ -174,10 +174,8 @@ class PromptEditorService:
         # Split into lines to handle lists
         lines = [line.strip() for line in reply.splitlines() if line.strip()]
 
-        # Remove lines with questions for follow-ups
+        # Drop greeting lines that slipped through
         if is_follow_up:
-            lines = [line for line in lines if '?' not in line]
-            # Also drop greeting lines that slipped through
             lines = [line for line in lines if not re.match(r'^(sawasdee|hello|hi|hey)\b', line, flags=re.IGNORECASE)]
 
         # Remove handholding/invite phrases
@@ -199,16 +197,12 @@ class PromptEditorService:
         sentences = [s.strip() for s in sentences if s.strip()]
 
         if is_follow_up:
-            sentences = sentences[:2]  # max 2 sentences
+            sentences = sentences[:2]  # max 2 sentences, may include one question if present
         else:
             sentences = sentences[:3]  # max 3 sentences
 
         # Reassemble
         final = " ".join(sentences).strip()
-
-        # Ensure no trailing question on follow-ups
-        if is_follow_up and final.endswith('?'):
-            final = final.rstrip(' ?').rstrip()
 
         return final
 
