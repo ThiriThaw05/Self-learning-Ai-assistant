@@ -9,7 +9,7 @@ This document provides step-by-step instructions for building a Next.js chat int
 **Goal**: Build a modern chat interface for the DTV visa assistant  
 **Framework**: Next.js 14 (App Router)  
 **Hosting**: Vercel (free tier)  
-**Backend API**: https://self-learning-ai-assistant.onrender.com
+**Backend API**: https://thirithaw-hackathon.onrender.com
 
 ---
 
@@ -73,7 +73,7 @@ Add this content:
 
 ```env
 # Backend API URL
-NEXT_PUBLIC_API_URL=https://self-learning-ai-assistant.onrender.com
+NEXT_PUBLIC_API_URL=https://thirithaw-hackathon.onrender.com
 
 # Optional: For development/testing
 # NEXT_PUBLIC_API_URL=http://localhost:5000
@@ -199,7 +199,7 @@ import {
   ChatHistory 
 } from '@/types';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://self-learning-ai-assistant.onrender.com';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://thirithaw-hackathon.onrender.com';
 
 export async function generateReply(
   message: string, 
@@ -836,7 +836,7 @@ git push -u origin main
    - Click **"Environment Variables"**
    - Add:
      - **Name**: `NEXT_PUBLIC_API_URL`
-     - **Value**: `https://self-learning-ai-assistant.onrender.com`
+     - **Value**: `https://thirithaw-hackathon.onrender.com`
 
 7. Click **"Deploy"**
 
@@ -904,7 +904,7 @@ Create new pages in `src/app/` folder:
 ### CORS Errors
 If you see CORS errors, the backend already has CORS enabled. If issues persist, check:
 - API URL is correct in `.env.local`
-- Backend is running (check https://self-learning-ai-assistant.onrender.com/health)
+- Backend is running (check https://thirithaw-hackathon.onrender.com/health)
 
 ### Build Errors
 ```bash
@@ -938,5 +938,5 @@ Your frontend is now live on Vercel and connected to your self-learning AI backe
 
 **URLs:**
 - Frontend: `https://your-app.vercel.app`
-- Backend: `https://self-learning-ai-assistant.onrender.com`
+- Backend: `https://thirithaw-hackathon.onrender.com`
 - Admin: `https://your-app.vercel.app/admin`

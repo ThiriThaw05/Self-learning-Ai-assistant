@@ -1,11 +1,11 @@
 # DTV Assistant API Test Commands
 
-**Base URL:** `https://self-learning-ai-assistant.onrender.com`
+**Base URL:** `https://thirithaw-hackathon.onrender.com`
 
 ## Quick Health Check
 
 ```bash
-curl -s https://self-learning-ai-assistant.onrender.com/health
+curl -s https://thirithaw-hackathon.onrender.com/health
 ```
 
 Expected: `{"status": "healthy"}`
@@ -29,7 +29,7 @@ Expected: `{"status": "healthy"}`
 
 ### Test 1.1 - Initial Inquiry
 ```bash
-curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
+curl -s -X POST https://thirithaw-hackathon.onrender.com/generate-reply \
   -H "Content-Type: application/json" \
   -d '{
     "message": "Hello, I am interested in the DTV visa for Thailand. I work remotely as a software developer for a US company.",
@@ -41,7 +41,7 @@ curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
 
 ### Test 1.2 - Country and Nationality
 ```bash
-curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
+curl -s -X POST https://thirithaw-hackathon.onrender.com/generate-reply \
   -H "Content-Type: application/json" \
   -d '{
     "message": "I am American and currently in Bali. Can I apply from Indonesia?",
@@ -56,7 +56,7 @@ curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
 
 ### Test 1.3 - Document Requirements
 ```bash
-curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
+curl -s -X POST https://thirithaw-hackathon.onrender.com/generate-reply \
   -H "Content-Type: application/json" \
   -d '{
     "message": "What documents do I need to prepare?",
@@ -79,7 +79,7 @@ curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
 
 ### Test 1.4 - Financial Requirement Confirmation
 ```bash
-curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
+curl -s -X POST https://thirithaw-hackathon.onrender.com/generate-reply \
   -H "Content-Type: application/json" \
   -d '{
     "message": "My bank balance has been above $15,000 USD for the past year. Do I need to convert it to THB?",
@@ -98,7 +98,7 @@ curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
 
 ### Test 2.1 - Initial Inquiry
 ```bash
-curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
+curl -s -X POST https://thirithaw-hackathon.onrender.com/generate-reply \
   -H "Content-Type: application/json" \
   -d '{
     "message": "Hi! I want to apply for DTV using Thai cooking class. Already enrolled at a school in Chiang Mai.",
@@ -110,7 +110,7 @@ curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
 
 ### Test 2.2 - Singapore Application with Multiple Facts
 ```bash
-curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
+curl -s -X POST https://thirithaw-hackathon.onrender.com/generate-reply \
   -H "Content-Type: application/json" \
   -d '{
     "message": "I am from Singapore. Planning to apply from here. My course is from March to August next year. I have 80,000 SGD in savings. Is that enough?",
@@ -130,7 +130,7 @@ Should NOT ask confirmation questions about these facts.
 
 ### Test 2.3 - School Documents
 ```bash
-curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
+curl -s -X POST https://thirithaw-hackathon.onrender.com/generate-reply \
   -H "Content-Type: application/json" \
   -d '{
     "message": "What documents do I need from the cooking school?",
@@ -154,7 +154,7 @@ curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
 
 ### Test 3.1 - Rejection Help
 ```bash
-curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
+curl -s -X POST https://thirithaw-hackathon.onrender.com/generate-reply \
   -H "Content-Type: application/json" \
   -d '{
     "message": "Hello I need help urgently. My DTV application was rejected in Vietnam",
@@ -166,7 +166,7 @@ curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
 
 ### Test 3.2 - Insufficient Documentation Analysis
 ```bash
-curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
+curl -s -X POST https://thirithaw-hackathon.onrender.com/generate-reply \
   -H "Content-Type: application/json" \
   -d '{
     "message": "I am Australian. Bank statement showed 400,000 THB for 6 months. Enrollment was for 4 months Muay Thai.",
@@ -183,7 +183,7 @@ curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
 
 ### Test 3.3 - Reapplication Options (Laos)
 ```bash
-curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
+curl -s -X POST https://thirithaw-hackathon.onrender.com/generate-reply \
   -H "Content-Type: application/json" \
   -d '{
     "message": "Can I reapply? I can add more money and extend training.",
@@ -203,7 +203,7 @@ curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
 
 ### Test 3.4 - Laos Interview Questions
 ```bash
-curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
+curl -s -X POST https://thirithaw-hackathon.onrender.com/generate-reply \
   -H "Content-Type: application/json" \
   -d '{
     "message": "An interview? What do they ask?",
@@ -222,7 +222,7 @@ curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
 
 ### Test 3.5 - Laos Fees
 ```bash
-curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
+curl -s -X POST https://thirithaw-hackathon.onrender.com/generate-reply \
   -H "Content-Type: application/json" \
   -d '{
     "message": "What is your service fee for Laos?",
@@ -244,7 +244,7 @@ curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
 
 ### Test 4.1 - Freelancer Eligibility
 ```bash
-curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
+curl -s -X POST https://thirithaw-hackathon.onrender.com/generate-reply \
   -H "Content-Type: application/json" \
   -d '{
     "message": "Hi, I am a freelance graphic designer. Can I apply for DTV?",
@@ -256,7 +256,7 @@ curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
 
 ### Test 4.2 - Thai Client Problem
 ```bash
-curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
+curl -s -X POST https://thirithaw-hackathon.onrender.com/generate-reply \
   -H "Content-Type: application/json" \
   -d '{
     "message": "One of my clients is actually a Thai company. Is that a problem?",
@@ -275,7 +275,7 @@ curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
 
 ### Test 4.3 - Translation Requirements
 ```bash
-curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
+curl -s -X POST https://thirithaw-hackathon.onrender.com/generate-reply \
   -H "Content-Type: application/json" \
   -d '{
     "message": "My business documents are in German. Do I need official translations?",
@@ -297,7 +297,7 @@ curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
 
 ### Test 5.1 - Crypto Question
 ```bash
-curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
+curl -s -X POST https://thirithaw-hackathon.onrender.com/generate-reply \
   -H "Content-Type: application/json" \
   -d '{
     "message": "Does crypto count towards the 500,000 THB requirement?",
@@ -312,7 +312,7 @@ curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
 
 ### Test 5.2 - Stocks Question
 ```bash
-curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
+curl -s -X POST https://thirithaw-hackathon.onrender.com/generate-reply \
   -H "Content-Type: application/json" \
   -d '{
     "message": "What about stocks or investment accounts?",
@@ -330,7 +330,7 @@ curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
 
 ### Test 5.3 - Should I Sell Stocks?
 ```bash
-curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
+curl -s -X POST https://thirithaw-hackathon.onrender.com/generate-reply \
   -H "Content-Type: application/json" \
   -d '{
     "message": "I have about 300,000 THB in savings and 400,000 THB in stocks. Should I sell some stocks?",
@@ -349,7 +349,7 @@ curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
 
 ### Test 5.4 - 3-Month Alternative (CRITICAL TEST)
 ```bash
-curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
+curl -s -X POST https://thirithaw-hackathon.onrender.com/generate-reply \
   -H "Content-Type: application/json" \
   -d '{
     "message": "3 months? That is a long time. Is there any way around this?",
@@ -368,7 +368,7 @@ curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
 
 ### Test 5.5 - Which Embassy is Flexible? (CRITICAL TEST)
 ```bash
-curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
+curl -s -X POST https://thirithaw-hackathon.onrender.com/generate-reply \
   -H "Content-Type: application/json" \
   -d '{
     "message": "Which embassy is less strict about this?",
@@ -390,7 +390,7 @@ curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
 
 ### Test 6.1 - Staying with Friend
 ```bash
-curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
+curl -s -X POST https://thirithaw-hackathon.onrender.com/generate-reply \
   -H "Content-Type: application/json" \
   -d '{
     "message": "I am staying with a friend. I do not have utilities in my name here.",
@@ -413,7 +413,7 @@ curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
 
 ### Test 7.1 - 90-Day Reporting
 ```bash
-curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
+curl -s -X POST https://thirithaw-hackathon.onrender.com/generate-reply \
   -H "Content-Type: application/json" \
   -d '{
     "message": "What about 90-day reporting? I heard that is required?",
@@ -435,7 +435,7 @@ curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
 
 ### Test: Improve AI with Real Consultant Reply
 ```bash
-curl -s -X POST https://self-learning-ai-assistant.onrender.com/improve-ai \
+curl -s -X POST https://thirithaw-hackathon.onrender.com/improve-ai \
   -H "Content-Type: application/json" \
   -d '{
     "client_message": "Does crypto count towards the 500,000 THB requirement?",
@@ -448,14 +448,14 @@ curl -s -X POST https://self-learning-ai-assistant.onrender.com/improve-ai \
 
 ### Test: Get Current Prompt
 ```bash
-curl -s https://self-learning-ai-assistant.onrender.com/get-prompt
+curl -s https://thirithaw-hackathon.onrender.com/get-prompt
 ```
 
 **Expected behavior:** Returns current chatbot prompt.
 
 ### Test: Reset Prompt to Base
 ```bash
-curl -s -X POST https://self-learning-ai-assistant.onrender.com/reset-prompt
+curl -s -X POST https://thirithaw-hackathon.onrender.com/reset-prompt
 ```
 
 **Expected behavior:** Resets prompt to base template, returns confirmation.
@@ -485,7 +485,7 @@ Save each curl command response and verify against expected behaviors. For autom
 
 ```bash
 # Run all tests and save outputs
-curl -s -X POST https://self-learning-ai-assistant.onrender.com/generate-reply \
+curl -s -X POST https://thirithaw-hackathon.onrender.com/generate-reply \
   -H "Content-Type: application/json" \
   -d '{"message": "Does crypto count towards the 500,000 THB requirement?", "chat_history": []}' \
   >> test_results.json
