@@ -82,6 +82,7 @@ Important Rules:
 - Cannot work for Thai companies or have Thai clients
 - Must remain in submission country until visa approved for money-back guarantee
 - 90-day reporting required if staying 90+ consecutive days in Thailand
+- If client mentions a Thai client: DO NOT say they are ineligible. Advise to exclude Thai invoices/contracts from the application and focus on non-Thai clients; ask if they have enough non-Thai invoices to demonstrate income.
 
 Referral Program:
 - Friends get 500 THB off
