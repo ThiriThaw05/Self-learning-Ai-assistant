@@ -1,6 +1,7 @@
 from app.services.llm_service import get_llm_service
 from app.services.db_service import get_db_service
 from app.prompts.base_prompts import EDITOR_PROMPT, MANUAL_EDITOR_PROMPT, CHATBOT_PROMPT
+import re
 
 
 class PromptEditorService:
@@ -159,8 +160,45 @@ class PromptEditorService:
             chat_history=chat_history,
             client_message=client_message
         )
-        
-        return self.llm.generate(full_prompt)
+        raw_reply = self.llm.generate(full_prompt, max_tokens=220)
+        return self._postprocess_reply(raw_reply, chat_history)
+
+    def _postprocess_reply(self, reply: str, chat_history: str) -> str:
+        """Enforce greeting/question bans and length caps."""
+        is_follow_up = chat_history.strip() != "No previous messages."
+
+        # Strip leading greetings on follow-ups
+        if is_follow_up:
+            reply = re.sub(r"^\s*(sawasdee|hello|hi|hey)[!,.\s-]*", "", reply, flags=re.IGNORECASE)
+
+        # Split into lines to handle lists
+        lines = [line.strip() for line in reply.splitlines() if line.strip()]
+
+        # Remove lines with questions for follow-ups
+        if is_follow_up:
+            lines = [line for line in lines if '?' not in line]
+
+        # Rejoin for sentence trimming
+        text = " ".join(lines)
+
+        # Sentence split
+        sentences = re.split(r"(?<=[.!?])\s+", text)
+        # Drop empty fragments
+        sentences = [s.strip() for s in sentences if s.strip()]
+
+        if is_follow_up:
+            sentences = sentences[:2]  # max 2 sentences
+        else:
+            sentences = sentences[:3]  # max 3 sentences
+
+        # Reassemble
+        final = " ".join(sentences).strip()
+
+        # Ensure no trailing question on follow-ups
+        if is_follow_up and final.endswith('?'):
+            final = final.rstrip(' ?').rstrip()
+
+        return final
 
     def _extract_prompt_from_raw(self, raw: str) -> str:
         """
