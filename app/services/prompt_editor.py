@@ -169,7 +169,7 @@ class PromptEditorService:
 
         # Strip leading greetings on follow-ups
         if is_follow_up:
-            reply = re.sub(r"^\s*(sawasdee|hello|hi|hey)[!,.\s-]*", "", reply, flags=re.IGNORECASE)
+            reply = re.sub(r"^\s*(sawasdee[^\w]*|hello[^\w]*|hi[^\w]*|hey[^\w]*)", "", reply, flags=re.IGNORECASE)
 
         # Split into lines to handle lists
         lines = [line.strip() for line in reply.splitlines() if line.strip()]
@@ -177,6 +177,18 @@ class PromptEditorService:
         # Remove lines with questions for follow-ups
         if is_follow_up:
             lines = [line for line in lines if '?' not in line]
+            # Also drop greeting lines that slipped through
+            lines = [line for line in lines if not re.match(r'^(sawasdee|hello|hi|hey)\b', line, flags=re.IGNORECASE)]
+
+        # Remove handholding/invite phrases
+        invite_patterns = [r"would you like", r"let me ", r"can i ", r"shall i", r"i can .*guide", r"we can .*guide"]
+        filtered_lines = []
+        for line in lines:
+            lower = line.lower()
+            if any(re.search(pat, lower) for pat in invite_patterns):
+                continue
+            filtered_lines.append(line)
+        lines = filtered_lines
 
         # Rejoin for sentence trimming
         text = " ".join(lines)
