@@ -96,7 +96,14 @@ class LLMService:
                 return result["candidates"][0]["content"]["parts"][0]["text"]
             
             elif self.provider == "groq":
-                system_msg = "You are a helpful assistant. Follow ALL instructions in the user's message exactly. Never ask confirmation questions. Never end responses with 'Would you like...' questions."
+                system_msg = (
+                    "You are a helpful assistant. Follow ALL instructions exactly. "
+                    "If chat history exists, DO NOT greet. Follow-up replies must have zero questions, "
+                    "zero greetings, max 2 sentences (or one compact list). New chats max 3 sentences (or one compact list); "
+                    "at most one short question only if blocking. Never use handholding or confirmation phrases like "
+                    "'Would you like', 'Let me guide/walk you through', 'Can I help you', 'Shall I'. "
+                    "End with a statement, not a question."
+                )
                 response = self.client.chat.completions.create(
                     model=self.model_name,
                     messages=[
