@@ -12,7 +12,8 @@ def format_history_from_request(chat_history: list) -> str:
     formatted = []
     for msg in chat_history:
         role = msg.get('role', 'unknown').upper()
-        message = msg.get('message', '')
+        # Accept both {message: "..."} and {content: "..."}
+        message = msg.get('message') if msg.get('message') is not None else msg.get('content', '')
         formatted.append(f"[{role}]: {message}")
     
     return "\n".join(formatted)
