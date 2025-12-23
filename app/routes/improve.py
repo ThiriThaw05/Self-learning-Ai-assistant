@@ -12,7 +12,8 @@ def format_history_from_request(chat_history: list) -> str:
     formatted = []
     for msg in chat_history:
         role = msg.get('role', 'unknown').upper()
-        message = msg.get('message', '')
+        # Accept both {message: "..."} and {content: "..."}
+        message = msg.get('message') if msg.get('message') is not None else msg.get('content', '')
         formatted.append(f"[{role}]: {message}")
     
     return "\n".join(formatted)
@@ -46,9 +47,10 @@ def improve_ai():
         if not data:
             return jsonify({"error": "Request body is required"}), 400
         
-        client_sequence = data.get('clientSequence', '')
-        chat_history = data.get('chatHistory', [])
-        consultant_reply = data.get('consultantReply', '')
+        # Accept both camelCase and snake_case keys
+        client_sequence = data.get('clientSequence') or data.get('client_message') or data.get('message', '')
+        chat_history = data.get('chatHistory') or data.get('chat_history', [])
+        consultant_reply = data.get('consultantReply') or data.get('consultant_reply', '')
         
         if not client_sequence:
             return jsonify({"error": "clientSequence is required"}), 400
