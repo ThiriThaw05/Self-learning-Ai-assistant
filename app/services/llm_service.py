@@ -122,11 +122,16 @@ class LLMService:
                 last_error = None
                 for model in self.model_names:
                     try:
+                        # Use system message for better instruction following
+                        system_msg = "You are a helpful assistant. Follow ALL instructions in the user's message exactly. Never ask confirmation questions. Never end responses with 'Would you like...' questions."
                         response = self.client.chat.completions.create(
                             model=model,
-                            messages=[{"role": "user", "content": prompt}],
+                            messages=[
+                                {"role": "system", "content": system_msg},
+                                {"role": "user", "content": prompt}
+                            ],
                             max_tokens=max_tokens,
-                            temperature=0.5  # Lower temperature for more consistent, instruction-following responses
+                            temperature=0.3  # Even lower temperature for better instruction following
                         )
                         if model != self.model_names[0]:
                             print(f"⚠️ Using fallback model: {model}")
