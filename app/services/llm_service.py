@@ -48,8 +48,7 @@ class LLMService:
             self.api_key = os.getenv("GOOGLE_API_KEY")
             if not self.api_key:
                 raise ValueError("GOOGLE_API_KEY not found")
-            # Try multiple model names for compatibility
-            self.model_names = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"]
+            self.model_name = "gemini-2.0-flash"
             
         elif self.provider == "groq":
             api_key = os.getenv("GROQ_API_KEY")
@@ -58,13 +57,7 @@ class LLMService:
             if Groq is None:
                 raise ValueError("groq package not installed")
             self.client = Groq(api_key=api_key)
-            # Primary model with fallbacks for rate limiting
-            self.model_names = [
-                "llama-3.3-70b-versatile",  # Best quality
-                "llama-3.1-8b-instant",      # Faster, lower rate limit usage
-                "gemma2-9b-it"               # Alternative fallback
-            ]
-            self.model_name = self.model_names[0]
+            self.model_name = "llama-3.3-70b-versatile"
             
         elif self.provider == "anthropic":
             api_key = os.getenv("ANTHROPIC_API_KEY")
@@ -89,63 +82,31 @@ class LLMService:
         """Generate a response from the LLM."""
         try:
             if self.provider == "google":
-                # Try multiple model names until one works
-                last_error = None
-                for model_name in self.model_names:
-                    try:
-                        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={self.api_key}"
-                        
-                        payload = {
-                            "contents": [{"parts": [{"text": prompt}]}],
-                            "generationConfig": {
-                                "maxOutputTokens": max_tokens,
-                                "temperature": 0.5  # Lower temperature for more consistent responses
-                            }
-                        }
-                        
-                        response = requests.post(url, json=payload)
-                        response.raise_for_status()
-                        
-                        result = response.json()
-                        print(f"✅ Google model {model_name} worked!")
-                        return result["candidates"][0]["content"]["parts"][0]["text"]
-                    except requests.exceptions.HTTPError as e:
-                        last_error = e
-                        print(f"⚠️ Model {model_name} failed: {e}")
-                        continue
-                
-                # All models failed
-                raise last_error or Exception("All Google models failed")
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model_name}:generateContent?key={self.api_key}"
+                payload = {
+                    "contents": [{"parts": [{"text": prompt}]}],
+                    "generationConfig": {
+                        "maxOutputTokens": max_tokens,
+                        "temperature": 0.5  # Lower temperature for more consistent responses
+                    }
+                }
+                response = requests.post(url, json=payload)
+                response.raise_for_status()
+                result = response.json()
+                return result["candidates"][0]["content"]["parts"][0]["text"]
             
             elif self.provider == "groq":
-                # Try models with fallback for rate limiting
-                last_error = None
-                for model in self.model_names:
-                    try:
-                        # Use system message for better instruction following
-                        system_msg = "You are a helpful assistant. Follow ALL instructions in the user's message exactly. Never ask confirmation questions. Never end responses with 'Would you like...' questions."
-                        response = self.client.chat.completions.create(
-                            model=model,
-                            messages=[
-                                {"role": "system", "content": system_msg},
-                                {"role": "user", "content": prompt}
-                            ],
-                            max_tokens=max_tokens,
-                            temperature=0.3  # Even lower temperature for better instruction following
-                        )
-                        if model != self.model_names[0]:
-                            print(f"⚠️ Using fallback model: {model}")
-                        return response.choices[0].message.content
-                    except Exception as e:
-                        error_str = str(e)
-                        if "rate_limit" in error_str.lower() or "429" in error_str:
-                            print(f"⚠️ Rate limited on {model}, trying fallback...")
-                            last_error = e
-                            continue
-                        else:
-                            raise e
-                # All models rate limited
-                raise last_error or Exception("All Groq models rate limited")
+                system_msg = "You are a helpful assistant. Follow ALL instructions in the user's message exactly. Never ask confirmation questions. Never end responses with 'Would you like...' questions."
+                response = self.client.chat.completions.create(
+                    model=self.model_name,
+                    messages=[
+                        {"role": "system", "content": system_msg},
+                        {"role": "user", "content": prompt}
+                    ],
+                    max_tokens=max_tokens,
+                    temperature=0.3  # Even lower temperature for better instruction following
+                )
+                return response.choices[0].message.content
             
             elif self.provider == "anthropic":
                 response = self.client.messages.create(

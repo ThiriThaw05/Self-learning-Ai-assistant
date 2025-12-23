@@ -64,6 +64,16 @@ class PromptEditorService:
                 "updated_prompt": result["prompt"],
                 "changes_made": result.get("changes_made", "No description provided")
             }
+
+        # Fallback: try to salvage a prompt from raw LLM output when JSON parsing fails
+        fallback = self._extract_prompt_from_raw(result.get("raw_response", ""))
+        if fallback:
+            success = self.db.update_prompt("chatbot_prompt", fallback)
+            return {
+                "success": success,
+                "updated_prompt": fallback,
+                "changes_made": result.get("changes_made", "Extracted prompt from raw response")
+            }
         
         return {
             "success": False,
@@ -151,6 +161,27 @@ class PromptEditorService:
         )
         
         return self.llm.generate(full_prompt)
+
+    def _extract_prompt_from_raw(self, raw: str) -> str:
+        """
+        Attempt to pull a prompt string out of a messy LLM response when JSON parsing failed.
+        """
+        import re
+        if not raw:
+            return ""
+
+        # Try to capture text inside a "prompt": "..." block
+        match = re.search(r'"prompt"\s*:\s*"(.*?)"', raw, re.DOTALL)
+        if match:
+            extracted = match.group(1)
+        else:
+            extracted = raw
+
+        # Clean common escape sequences and trim
+        extracted = extracted.replace('\\n', '\n').replace('\\"', '"').strip()
+
+        # Ignore obviously too-short outputs that aren't real prompts
+        return extracted if len(extracted) > 100 else ""
 
 
 # Singleton instance
